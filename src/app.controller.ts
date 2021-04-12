@@ -1,17 +1,22 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseInterceptors,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 
-import { AuthGuard } from './common/guards/auth.guard';
-import { Auth } from './common/decorators/auth.decorator';
-
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { ExceptionInterceptor } from './common/interceptors/exception.interceptor';
 @Controller()
-@Auth()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/hello')
-  @UseGuards(AuthGuard)
+  @UseInterceptors(ExceptionInterceptor)
   hello(): string {
+    throw new ForbiddenException('no auth...');
     return 'hello';
   }
 }
